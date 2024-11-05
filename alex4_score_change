@@ -1,0 +1,98 @@
+from ptrace.debugger import PtraceDebugger
+from ptrace.debugger.memory_mapping import readProcessMappings, MemoryMapping
+import time
+import struct
+
+# PID du processus Alex4 (remplace par le bon PID)
+alex4_pid = 54226  # Remplacez par le PID actuel du processus Alex4
+
+def pause_process(pid):
+    """Attache au processus avec PTRACE et le met en pause."""
+    debugger = PtraceDebugger()
+    process = debugger.addProcess(pid, False)
+    process.syscall()
+    print(f"Processus {pid} mis en pause.")
+    return debugger, process
+
+def resume_process(debugger, process):
+    """Reprend l'exécution du processus."""
+    process.cont()
+    debugger.quit()
+    print(f"Processus {process.pid} repris.")
+
+def get_mapping(process) -> [MemoryMapping]:
+    """Récupère les mappages de mémoire du processus."""
+    mappings = readProcessMappings(process)
+    mapping_list = []
+    for mapping in mappings:
+        mapping_list.append({
+            'start': mapping.start,
+            'end': mapping.end,
+            'permissions': mapping.permissions,
+            'pathname': mapping.pathname
+        })
+    return mapping_list
+
+def get_stack_mappings(mappings_list):
+    """Filtre les mappages de la pile (stack) du processus."""
+    return [mapping for mapping in mappings_list if mapping['pathname'] == '[stack]']
+
+def read_stack_content(process, stack_mapping):
+    """Lit le contenu de la pile et le renvoie sous forme de chaîne."""
+    start_addr = stack_mapping['start']
+    end_addr = stack_mapping['end']
+    content = f"Reading stack content from {hex(start_addr)} to {hex(end_addr)}\n"
+    
+    addr = start_addr
+    while addr < end_addr:
+        try:
+            data = process.readBytes(addr, 4)
+            value = struct.unpack('<I', data)[0]
+            content += f"{hex(addr)}: {hex(value)}\n"
+        except Exception as e:
+            content += f"Impossible de lire à l'adresse {hex(addr)}: {e}\n"
+        addr += 4
+    return content
+
+def modify_memory(process, address, new_value):
+    """Modifie la valeur à une adresse mémoire spécifique dans le processus."""
+    try:
+        process.writeBytes(address, struct.pack('<Q', new_value))  # '<Q' pour un entier 64 bits (little-endian)
+        print(f"Modification de la mémoire à l'adresse {hex(address)} avec la nouvelle valeur {hex(new_value)}.")
+    except Exception as e:
+        print(f"Erreur lors de la modification de la mémoire: {e}")
+
+# Utilisation
+# Etape 1 : Mettre en pause le processus
+debugger, process = pause_process(alex4_pid)
+
+# Etape 2 : Récupérer les mappages mémoire
+mappings_list = get_mapping(process)
+
+# Etape 3 : Filtrer pour obtenir uniquement les mappages de la pile
+stack_mappings = get_stack_mappings(mappings_list)
+print("Mappages 'stack' du processus :")
+for mapping in stack_mappings:
+    print({
+        'start': hex(mapping['start']),
+        'end': hex(mapping['end']),
+        'permissions': mapping['permissions']
+    })
+
+    # Etape 4 : Lire le contenu de la pile et l'écrire dans un fichier
+    stack_content = read_stack_content(process, mapping)
+    with open("stack_content_.txt", "w") as fichier:
+        fichier.write(stack_content)
+
+# Adresse mémoire à modifier (à remplacer par une adresse spécifique dans le mappage de la pile)
+address = 0x557a12022c48  # Remplacez par l'adresse réelle
+new_value = 0x28  # Exemple de nouvelle valeur pour le score (100 en hexadécimal)
+
+# Etape 5 : Modifier la mémoire à l'adresse spécifiée
+modify_memory(process, address, new_value)
+
+# Attendre 5 secondes pour observer le changement
+time.sleep(5)
+
+# Etape 6 : Reprendre le processus
+resume_process(debugger, process)
