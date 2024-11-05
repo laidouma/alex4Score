@@ -14,6 +14,13 @@ Le PID est le numéro retourné, ici : `54226`.
 
 
 ## Etape 2 : Réalisation du code
+Ce script permet de manipuler la mémoire du processus Alex4 en utilisant la bibliothèque ptrace. Il permet de :
+
+- Mettre en pause le processus,
+- Lire et analyser le mappage mémoire de la pile (stack),
+- Modifier une valeur spécifique en mémoire (par exemple, pour changer le score),
+- Reprendre le processus.
+
 
 **Fonctionnalités**
 - La fonction pause_process(pid) attache le débogueur au processus cible et met ce dernier en pause.
