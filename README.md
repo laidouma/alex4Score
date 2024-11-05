@@ -55,3 +55,22 @@ Dans `scanmem` :
 
 ## Etape 4 : Injection de Score dans notre code
 Fonction modify_memory(process, address, new_value).
+
+
+
+## Etape 5 : Tests
+
+Avant processus :
+![image](https://github.com/user-attachments/assets/cbea9379-c9fb-4c6c-9842-5a08df5ca1d4)
+
+Dans le code : 
+
+![image](https://github.com/user-attachments/assets/5789990a-7bb8-4c60-80f8-372e453e5392)
+
+0x28 = 40
+
+Après processus :
+
+![image](https://github.com/user-attachments/assets/19919041-e567-43ea-8bb7-411e3a763159)
+
+
