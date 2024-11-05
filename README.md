@@ -1,3 +1,26 @@
+# Alex4 - TP
+
+## Etape 1 : PID de alex4
+
+![image](https://github.com/user-attachments/assets/18402f68-ddb1-4dc8-94fd-33efc23af4fd)
+
+```bash
+pgrep alex4
+```
+Le PID est le numéro retourné, ici : `54226`.
+
+## Etape 2 : Réalisation du code
+**Fonctionnalités**
+- La fonction pause_process(pid) attache le débogueur au processus cible et met ce dernier en pause.
+- La fonction get_mapping(process) récupère les mappages mémoire du processus, incluant les sections d’adresse de la pile.
+- get_stack_mappings(mappings_list) filtre les mappages pour obtenir ceux de la pile, identifiés par le chemin [stack].
+- read_stack_content(process, stack_mapping) lit les données de la pile dans une section d’adresse spécifique et les enregistre dans un fichier stack_content.txt.
+- modify_memory(process, address, new_value) permet de modifier une valeur en mémoire à une adresse spécifique. Assurez-vous de définir address avec l’adresse mémoire exacte que vous souhaitez modifier et new_value avec la nouvelle valeur.
+- La fonction resume_process(debugger, process) relance le processus après modification de la mémoire.
+
+
+## Etape 3 : 
+
 # Injection de Score pour le Jeu Alex4
 
 Ce projet permet de manipuler et d'injecter un score dans le jeu **Alex4** en utilisant des techniques de manipulation de processus et d'adresses mémoire avec Python, **scanmem**, et **gdb**.
@@ -29,11 +52,9 @@ sudo apt-get install python3 gdb scanmem htop
 
 Trouvez le PID du processus du jeu Alex4 en utilisant la commande `pgrep`.
 
-```bash
-pgrep alex4
-```
 
-Le PID est le numéro retourné (par exemple, `53345`).
+
+
 
 ### 2. Pause et Reprise du Processus
 
