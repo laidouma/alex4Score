@@ -14,7 +14,6 @@ Ce projet permet de manipuler et d'injecter un score dans le jeu **Alex4** en ut
 - **Python 3**
 - **gdb** (GNU Debugger)
 - **scanmem**
-- **htop** (optionnel)
 
 ## Installation
 
